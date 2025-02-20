@@ -1,0 +1,49 @@
+import java.util.function.Function;
+
+
+class Utility {
+    public static int convertStringToInt(String str) {
+        return Integer.parseInt(str);
+    }
+}
+
+
+interface Greeting {
+    void sayHello(String name);
+
+    
+    default void defaultGreeting() {
+        System.out.println("Hello from the default method!");
+    }
+}
+
+
+class CustomGreeting implements Greeting {
+    @Override
+    public void sayHello(String name) {
+        System.out.println("Hello, " + name + "!");
+    }
+
+    
+    @Override
+    public void defaultGreeting() {
+        System.out.println("Custom greeting: Welcome to Java Programming!");
+    }
+}
+
+public class Main {
+    public static void main(String[] args) {
+        
+        Function<String, Integer> lambdaFunction = str -> Integer.parseInt(str);
+        System.out.println("Lambda Parsed number: " + lambdaFunction.apply("100"));
+
+       
+        Function<String, Integer> methodRefFunction = Utility::convertStringToInt;
+        System.out.println("Method Reference Parsed number: " + methodRefFunction.apply("200"));
+
+       
+        Greeting greeting = new CustomGreeting();
+        greeting.sayHello("Alice");
+        greeting.defaultGreeting(); // Calls overridden method
+    }
+}
