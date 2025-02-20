@@ -1,0 +1,71 @@
+import java.sql.*;
+
+public class BankingSystem {
+    public static void main(String[] args) {
+        String url = "jdbc:mysql://localhost:3306/bankdb";
+        String user = "root";
+        String password = "password";
+
+        Connection conn = null;
+        PreparedStatement pstmt = null;
+        Statement stmt = null;
+        
+        try {
+            
+            Class.forName("com.mysql.cj.jdbc.Driver");
+
+           
+            conn = DriverManager.getConnection(url, user, password);
+            conn.setAutoCommit(false);
+
+           RT INTO transactions (account_id, amount, type) VALUES (?, ?, ?)");
+            
+            pstmt.setInt(1, 101);
+            pstmt.setDouble(2, 500.00);
+            pstmt.setString(3, "Deposit");
+            pstmt.executeUpdate();
+            
+            pstmt.setInt(1, 102);
+            pstmt.setDouble(2, -200.00);
+            pstmt.setString(3, "Withdrawal");
+            pstmt.executeUpdate();
+
+            // Simulate an error to trigger rollback
+            if (true) { 
+                throw new SQLException("Simulated transaction failure");
+            }
+
+            conn.commit(); // Commit transaction
+        } catch (Exception e) {
+            try {
+                if (conn != null) {
+                    conn.rollback(); // Rollback transaction
+                    System.out.println("Transaction rolled back due to error: " + e.getMessage());
+                }
+            } catch (SQLException rollbackEx) {
+                rollbackEx.printStackTrace();
+            }
+        } finally {
+            
+            try {
+                if (pstmt != null) pstmt.close();
+                if (stmt != null) stmt.close();
+                if (conn != null) conn.close();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+
+        
+        Runnable evenChecker = () -> {
+            for (int i = 1; i <= 10; i++) {
+                if (i % 2 == 0) {
+                    System.out.println(i + " is even");
+                }
+            }
+        };
+
+        Thread thread = new Thread(evenChecker);
+        thread.start();
+    }
+}
