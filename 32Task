@@ -1,0 +1,116 @@
+import java.sql.*;
+import java.util.*;
+import java.util.stream.*;
+
+public class BankingSystem {
+    public static void main(String[] args) {
+        String url = "jdbc:mysql://localhost:3306/bankdb";
+        String user = "root";
+        String password = "password";
+
+        Connection conn = null;
+        PreparedStatement pstmt = null;
+        Statement stmt = null;
+        
+        try {
+            
+            Class.forName("com.mysql.cj.jdbc.Driver");
+
+           
+            conn = DriverManager.getConnection(url, user, password);
+            conn.setAutoCommit(false); // Start transaction
+
+           
+            pstmt = conn.prepareStatement("INSERT INTO transactions (account_id, amount, type) VALUES (?, ?, ?)");
+            
+            pstmt.setInt(1, 101);
+            pstmt.setDouble(2, 500.00);
+            pstmt.setString(3, "Deposit");
+            pstmt.executeUpdate();
+            
+            pstmt.setInt(1, 102);
+            pstmt.setDouble(2, -200.00);
+            pstmt.setString(3, "Withdrawal");
+            pstmt.executeUpdate();
+
+          
+            if (true) { 
+                throw new SQLException("Simulated transaction failure");
+            }
+
+            conn.commit(); // Commit transaction
+        } catch (Exception e) {
+            try {
+                if (conn != null) {
+                    conn.rollback(); // Rollback transaction
+                    System.out.println("Transaction rolled back due to error: " + e.getMessage());
+                }
+            } catch (SQLException rollbackEx) {
+                rollbackEx.printStackTrace();
+            }
+        } finally {
+            try {
+                if (pstmt != null) pstmt.close();
+                if (stmt != null) stmt.close();
+                if (conn != null) conn.close();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+
+        Runnable evenChecker = () -> {
+            for (int i = 1; i <= 10; i++) {
+                if (i % 2 == 0) {
+                    System.out.println(i + " is even");
+                }
+            }
+        };
+
+        Thread thread = new Thread(evenChecker);
+        thread.start();
+
+       
+        List<Student> students = Arrays.asList(
+            new Student("Alice", 85),
+            new Student("Bob", 75),
+            new Student("Charlie", 90),
+            new Student("David", 65)
+        );
+        
+        List<Student> topStudents = students.stream()
+            .filter(s -> s.getMarks() > 80)
+            .collect(Collectors.toList());
+        
+        topStudents.forEach(s -> System.out.println(s.get// Convert list of names to uppercase using map()
+        List<String> names = Arrays.asList("Alice", "Bob", "Charlie", "David");
+        List<String> upperNames = names.stream()
+            .map(String::toUpperCase)
+            .collect(Collectors.toList());
+        
+        upperNames.forEach(System.out::println);
+
+      
+        List<Integer> numbers = Arrays.asList(1, 2, 3, 4, 5);
+        int sum = numbers.stream().reduce(0, Integer::sum);
+        
+        System.out.println("Sum of numbers: " + sum);
+    }
+}
+
+class Student {
+    private String name;
+    private int marks;
+
+    public Student(String name, int marks) {
+        this.name = name;
+        this.marks = marks;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public int getMarks() {
+        return marks;
+    }
+}
